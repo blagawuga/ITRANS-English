@@ -10,12 +10,25 @@
     if ($conn->connect_error) {
         die("Connection failed: " . $conn->connect_error);
     } 
-    $conn->set_charset("utf8");
-    $k = $_POST['text'];
-    $k_2 = $_POST['default-text'];
-    $sql = 'SELECT word, meaning1 FROM tbl_hindi WHERE meaning1="'. $k. '"';
-    #print $sql."<br>";
-    $result = $conn->query($sql);
+	$conn->set_charset("utf8");
+	$t = 0;
+	if($_POST['text'] != "")
+	{
+		$k = $_POST['text'];
+		$t = 1;
+	}
+	$t_2 = 0;
+	$k_2 = $_POST['default-text'];
+	if($_POST['default-text-English'] != "")
+	{
+		$k_english = $_POST['default-text-English'];
+		$t_2 = 1;
+	}
+	$sql = 'SELECT DISTINCT word, meaning1 FROM tbl_hindi WHERE meaning1="'. $k. '"';
+	$sql_2 = 'SELECT DISTINCT word, meaning1 FROM tbl_hindi WHERE word="'. $k_english. '"';
+    #print $sql."<br>";Q
+	$result = $conn->query($sql);
+	$result_2 = $conn->query($sql_2);
 
     
 
@@ -86,15 +99,31 @@
 				<a href="#example">Example itrans input text and output</a>
                 -->
                 <div class="link-2">
-                    <label for="i-sel-1">English translation:</label>
+                    <label for="i-t">English translation:</label>
                     <br>
-                    <textarea rows="10" cols="50" name="text" class="form-control" placeholder="Converted text will be displayed here..." readonly="">
+                    <textarea id="i-t" rows="10" cols="50" name="text" class="form-control" placeholder="Converted text will be displayed here..." readonly="">
                        <?php
-                            if ($result->num_rows > 0) {
+                            if ($result->num_rows > 0 and $t == 1) {
                                 echo "&#10;&#10;";
                                 // output data of each row
                                 while($row = $result->fetch_assoc()) {
                                     echo "Word: " . $row["word"]. " - Meaning: " . $row["meaning1"]. "&#10;&#10;";
+                                }
+                            } else {
+                                echo "No meaning found for \"".$k_2."\", please try again";
+                            }
+                        ?>
+					</textarea>
+					
+                    <label for="i-t-2">Hindi translation:</label>
+                    <br>
+                    <textarea id="i-t-2" rows="10" cols="50" name="text" class="form-control" placeholder="Converted text will be displayed here..." readonly="">
+                       <?php
+                            if ($result_2->num_rows > 0 and $t_2 == 1) {
+                                echo "&#10;&#10;";
+                                // output data of each row
+                                while($row_2 = $result_2->fetch_assoc()) {
+                                    echo "Word: " . $row_2["word"]. " - Meaning: " . $row_2["meaning1"]. "&#10;&#10;";
                                 }
                             } else {
                                 echo "No meaning found for \"".$k_2."\", please try again";
